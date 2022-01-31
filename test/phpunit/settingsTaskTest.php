@@ -88,12 +88,20 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
                 'name' => 'siteTitle',
                 'options' => ['value' => 'Cool Site']
             ],
+            [
+                'name' => 'informationobject',
+                'options' => ['scope' => 'ui_label', 'value' => 'Description']
+            ],
         ];
 
         $outputs = [
             [
                 'type' => 'text',
                 'value' => 'Cool Site',
+            ],
+            [
+                'type' => 'text',
+                'value' => 'Description',
             ],
         ];
 
