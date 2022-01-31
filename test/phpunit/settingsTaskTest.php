@@ -156,6 +156,39 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
         $task->getSettingValue('this does not exist', []);
     }
 
+    # TODO: make provider?
+    # TODO: see if we can read exception text?
+    public function testValidateOptionsNoCulture(): void
+    {
+        $this->expectException(Exception::class);
+
+        $task = new settingsTask(new sfEventDispatcher, new sfFormatter);
+        $task->setOrmClasses($this->ormClasses);
+
+        $task->validateOptions(['get', 'setting name'], []);
+    }
+
+    public function testValidateOptionsBadCulture(): void
+    {
+        $this->expectException(Exception::class);
+
+        $task = new settingsTask(new sfEventDispatcher, new sfFormatter);
+        $task->setOrmClasses($this->ormClasses);
+
+        $task->validateOptions(['get', 'setting name'], ['culture' => 'invalid']);
+    }
+
+    public function testValidateOptionsValueUsedForWrongOperation(): void
+    {
+        $this->expectException(Exception::class);
+
+        $task = new settingsTask(new sfEventDispatcher, new sfFormatter);
+        $task->setOrmClasses($this->ormClasses);
+
+        $task->validateOptions(['set', 'setting name'], ['value' => 'some value', 'culture' => 'en']);
+    }
+
+
     /*
     public function validateOptions($arguments, $options) {
         // Make sure culture is valid
