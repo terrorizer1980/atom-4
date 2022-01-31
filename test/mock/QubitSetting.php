@@ -22,6 +22,7 @@ namespace AccessToMemory\test\mock;
 class QubitSetting
 {
     const NAME = 'setting.NAME';
+    const SCOPE = 'setting.SCOPE';
 
     protected static $idCounter;
     protected static $settings;
@@ -45,6 +46,17 @@ class QubitSetting
 
             // Use index to return mock setting for name value
             $id = self::$index['by name'][$name][0];
+            return self::$settings[$id];
+        }
+
+        if ($sql == 'SELECT  FROM `setting` WHERE setting.NAME=:p1 AND setting.SCOPE=:p2')
+        {
+            // Determine name/scope values in query
+            $name = $criteria->getCriterion('setting.NAME')->getValue();
+            $scope = $criteria->getCriterion('setting.SCOPE')->getValue();
+
+            // Use index to return mock setting for name/scope values
+            $id = self::$index['by name and scope'][$name][$scope][0];
             return self::$settings[$id];
         }
     }

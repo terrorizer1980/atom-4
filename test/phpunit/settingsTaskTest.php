@@ -19,11 +19,15 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
             'setting' => \AccessToMemory\test\mock\QubitSetting::class,
         ];
 
-        $setting = new $this->ormClasses['setting']; #   new QubitSetting;
-        $setting->id = 1;
+        $setting = new $this->ormClasses['setting'];
         $setting->name = 'siteTitle';
-        $setting->scope = '';
         $setting->value = 'My Site';
+        $setting->save();
+
+        $setting = new $this->ormClasses['setting'];
+        $setting->name = 'informationobject';
+        $setting->scope = 'ui_label';
+        $setting->value = 'Archival description';
         $setting->save();
 
         /*
@@ -54,6 +58,10 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
                 'name' => 'siteTitle',
                 'options' => []
             ],
+            [
+                'name' => 'informationobject',
+                'options' => ['scope' => 'ui_label']
+            ],
         ];
 
         $outputs = [
@@ -61,10 +69,15 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
                 'type' => 'text',
                 'value' => 'My Site',
             ],
+            [
+                'type' => 'text',
+                'value' => 'Archival description',
+            ],
         ];
 
         return [
-            [$inputs[0], $outputs[0]]
+            [$inputs[0], $outputs[0]],
+            [$inputs[1], $outputs[1]]
         ];
     }
 
