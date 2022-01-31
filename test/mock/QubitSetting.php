@@ -63,6 +63,7 @@ class QubitSetting
 
     private function index()
     {
+        // Initialize indexes
         self::$index = [
             'by name' => [],
             'by name and scope' => []
@@ -70,6 +71,7 @@ class QubitSetting
 
         foreach (self::$settings as $id => $setting)
         {
+            // Initialize index arrays if need be
             if (!empty(self::$index['by name'][$setting->name]))
             {
                 self::$index['by name'][$setting->name] = [];
@@ -85,6 +87,7 @@ class QubitSetting
                 self::$index['by name and scope'][$setting->name][$setting->scope] = [];
             }
 
+            // Add IDs to indexes
             self::$index['by name'][$setting->name][] = $id;
             self::$index['by name and scope'][$setting->name][$setting->scope][] = $id;
         }
