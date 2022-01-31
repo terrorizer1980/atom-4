@@ -112,7 +112,7 @@ class settingsTask extends arBaseTask
 
                 $setting->name = $name;
             } else {
-                throw new Exception("Setting does not exist.");
+                throw new Exception("Settings can't be created in strict mode.");
             }
         }
 

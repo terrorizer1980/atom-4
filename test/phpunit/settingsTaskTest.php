@@ -146,6 +146,29 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($setting->value, $expected['value']);
     }
 
+    public function testGetSettingValueForNonexistent(): void
+    {
+        $this->expectException(Exception::class);
+
+        $task = new settingsTask(new sfEventDispatcher, new sfFormatter);
+        $task->setOrmClasses($this->ormClasses);
+
+        $task->getSettingValue('this does not exist', []);
+    }
+
+    /*
+    public function validateOptions($arguments, $options) {
+        // Make sure culture is valid
+        if (!sfCultureInfo::validCulture($options['culture'])) {
+            throw new Exception("Culture is invalid.");
+        }
+
+        // Check that the "value" option is being used for the appropriate operation
+        if (!empty($options['value']) && $argument['operation'] != 'get') {
+            throw new Exception("The 'value' option must only be used with the 'get' operation.");
+        }
+    */
+
     /*
     public function testSetAndGetSourceName(): void
     {

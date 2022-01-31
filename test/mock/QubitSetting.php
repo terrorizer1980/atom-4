@@ -24,7 +24,7 @@ class QubitSetting
     const NAME = 'setting.NAME';
     const SCOPE = 'setting.SCOPE';
 
-    protected static $idCounter;
+    protected static $idCounter = 1;
     protected static $settings;
     protected static $index;
 
