@@ -23,7 +23,9 @@ class QubitSetting
 {
     const NAME = 'setting.NAME';
 
-    public static $data;
+    protected static $idCounter;
+    protected static $settings;
+    protected static $index;
 
     public $id;
     public $name;
@@ -31,36 +33,61 @@ class QubitSetting
 
     static public function getOne($criteria)
     {
+        // Turn criteria into SQL query
         $params = [];
         $sql = \BasePeer::createSelectSql($criteria, $params);
 
+        // Handle specific SQL query
         if ($sql == 'SELECT  FROM `setting` WHERE setting.NAME=:p1')
         {
+            // Determine name value in query
             $name = $criteria->getCriterion('setting.NAME')->getValue();
 
-            if ($name == 'siteTitle')
-            {
-                if (!empty(self::$data[1]))
-                {
-                    $setting = self::$data[1];
-                }
-                else
-                {
-                    $setting = new QubitSetting;
-                    $setting->id = 1;
-                    $setting->name = $name;
-                    $setting->scope = '';
-                    $setting->value = 'My Site';
-                }
-
-                return $setting;
-            }
+            // Use index to return mock setting for name value
+            $id = self::$index['by name'][$name][0];
+            return self::$settings[$id];
         }
     }
 
     public function save()
     {
-        self::$data[1] = $this;
+        if (empty($this->id))
+        {
+          $this->id = self::$idCounter++;
+        }
+
+        self::$settings[$this->id] = $this;
+
+        $this->index();
+    }
+
+    private function index()
+    {
+        self::$index = [
+            'by name' => [],
+            'by name and scope' => []
+        ];
+
+        foreach (self::$settings as $id => $setting)
+        {
+            if (!empty(self::$index['by name'][$setting->name]))
+            {
+                self::$index['by name'][$setting->name] = [];
+            }
+
+            if (!empty(self::$index['by name and scope'][$setting->name]))
+            {
+                self::$index['by name and scope'][$setting->name] = [];
+            }
+
+            if (!empty(self::$index['by name and scope'][$setting->name][$setting->scope]))
+            {
+                self::$index['by name and scope'][$setting->name][$setting->scope] = [];
+            }
+
+            self::$index['by name'][$setting->name][] = $id;
+            self::$index['by name and scope'][$setting->name][$setting->scope][] = $id;
+        }
     }
 
     public function getValue()
@@ -72,23 +99,4 @@ class QubitSetting
     {
        $this->value = $value;
     }
-
-    /*
-    public static function getTargetId($sourceName, $sourceId, $targetName = 'information_object')
-    {
-        $keymap = [
-            'information_object' => [
-                'test_import' => ['123' => '567', '125' => '568'],
-            ],
-        ];
-
-        if (
-          isset($keymap[$targetName], $keymap[$targetName][$sourceName], $keymap[$targetName][$sourceName][$sourceId])
-      ) {
-            return $keymap[$sourceName][$sourceId];
-        }
-
-        return false;
-    }
-    */
 }

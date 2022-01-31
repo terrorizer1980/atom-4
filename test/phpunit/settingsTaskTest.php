@@ -19,6 +19,13 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
             'setting' => \AccessToMemory\test\mock\QubitSetting::class,
         ];
 
+        $setting = new $this->ormClasses['setting']; #   new QubitSetting;
+        $setting->id = 1;
+        $setting->name = 'siteTitle';
+        $setting->scope = '';
+        $setting->value = 'My Site';
+        $setting->save();
+
         /*
         // Define virtual file system
         $directory = [
