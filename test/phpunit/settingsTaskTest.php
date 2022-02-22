@@ -21,13 +21,18 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
 
         $setting = new $this->ormClasses['setting'];
         $setting->name = 'siteTitle';
-        $setting->value = 'My Site';
+        $setting->setValue('My Site');
         $setting->save();
 
         $setting = new $this->ormClasses['setting'];
         $setting->name = 'informationobject';
         $setting->scope = 'ui_label';
-        $setting->value = 'Archival description';
+        $setting->setValue('Archival description');
+        $setting->save();
+
+        $setting = new $this->ormClasses['setting'];
+        $setting->name = 'settingWithTranslation';
+        $setting->setValue('Français', ['culture' => 'fr']);
         $setting->save();
 
         /*
@@ -143,7 +148,7 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
 
         $setting = $task->getSetting($params['name'], $params['options']);
 
-        $this->assertSame($setting->value, $expected['value']);
+        $this->assertSame($setting->getValue(), $expected['value']);
     }
 
     public function testGetSettingValueForNonexistent(): void
@@ -186,6 +191,30 @@ class settingsTaskTest extends \PHPUnit\Framework\TestCase
         $task->setOrmClasses($this->ormClasses);
 
         $task->validateOptions(['set', 'setting name'], ['value' => 'some value', 'culture' => 'en']);
+    }
+
+    public function testGetSettingValueWithNonDefaultLanguage(): void
+    {
+        $task = new settingsTask(new sfEventDispatcher, new sfFormatter);
+        $task->setOrmClasses($this->ormClasses);
+
+        $setting = $task->getSetting('settingWithTranslation');
+
+        $this->assertSame($setting->getValue(['culture' => 'fr']), 'Français');
+    }
+
+    public function testSetSettingValueWithNonDefaultLanguage(): void
+    {
+        $task = new settingsTask(new sfEventDispatcher, new sfFormatter);
+        $task->setOrmClasses($this->ormClasses);
+
+        $options = ['value' => 'Español', 'culture' => 'es'];
+        $setting = $task->setSettingValue('settingWithTranslation', $options);
+
+        $setting = $task->getSetting('settingWithTranslation');
+
+        $this->assertSame($setting->getValue(['culture' => 'es']), 'Español');
+        $this->assertSame($setting->getValue(['culture' => 'fr']), 'Français');
     }
 
 

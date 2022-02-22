@@ -74,7 +74,7 @@ class settingsTask extends arBaseTask
         $this->log('Done.');
     }
 
-    public function getSetting($name, $options) {
+    public function getSetting($name, $options = []) {
         $criteria = new Criteria;
         $criteria->add($this->ormClasses['setting']::NAME, $name);
 

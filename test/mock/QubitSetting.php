@@ -23,14 +23,17 @@ class QubitSetting
 {
     const NAME = 'setting.NAME';
     const SCOPE = 'setting.SCOPE';
+    const DEFAULT_CULTURE = 'en';
 
-    protected static $idCounter = 1;
-    protected static $settings;
-    protected static $index;
+    protected static $idCounter = 1; // Used to simulate DB settings table primary key
+    protected static $settings;      // Used to simulate DB storing of settings data
+    protected static $index;         // Used to help simulate DB queries
 
     public $id;
     public $name;
     public $scope;
+    public $sourceCulture;
+    public $i18n = [];
 
     static public function getOne($criteria)
     {
@@ -66,6 +69,11 @@ class QubitSetting
         if (empty($this->id))
         {
           $this->id = self::$idCounter++;
+        }
+
+        if (empty($this->sourceCulture))
+        {
+          $this->sourceCulture = self::DEFAULT_CULTURE;
         }
 
         self::$settings[$this->id] = $this;
@@ -105,13 +113,47 @@ class QubitSetting
         }
     }
 
-    public function getValue()
+    public function getValue($options = [])
     {
-        return $this->value;
+        $culture = (isset($options['culture']))
+            ? $options['culture']
+            : self::DEFAULT_CULTURE;
+
+        // Handle source culture option
+        $culture = (!empty($options['sourceCulture']))
+            ? $this->sourceCulture
+            : $culture;
+
+        // Return i18n value if it exists
+        $value = null;
+
+        if (isset($this->i18n[$culture]))
+        {
+            return $this->i18n[$culture]['value'];
+        }
+
+        // Handle cultural fallback
+        if ($options['cultureFallback'] && $culture != $this->sourceCulture && $value === null)
+        {
+            return $this->getValue(['culture' => $this->sourceCulture]);
+        }
+
+        return $value;
     }
 
-    public function setValue($value, $options)
+    public function setValue($value, $options = [])
     {
-       $this->value = $value;
+        $culture = ($options['culture'])
+            ? $options['culture']
+            : self::DEFAULT_CULTURE;
+
+
+        // Make sure that i18n value array exists
+        if (!isset($this->i18n[$culture]))
+        {
+            $this->i18n[$culture] = [];
+        }
+
+        $this->i18n[$culture]['value'] = $value;
     }
 }
